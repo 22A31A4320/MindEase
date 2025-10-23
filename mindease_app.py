@@ -1,6 +1,6 @@
 """
 MindEase - Streamlit Mental Health Chatbot Prototype
-Single-file app demonstrating many features:
+Features:
 - Empathetic chat (OpenAI)
 - Emotion detection (transformers)
 - Mood tracking (SQLite)
@@ -9,20 +9,17 @@ Single-file app demonstrating many features:
 - Guided breathing
 - Crisis detection & helplines
 - Analytics and data export
-- Simple personalization & privacy controls
-- Light/Dark mode toggle added
+- Light/Dark mode toggle
 """
 
 import os
 import sqlite3
 import time
-import csv
 import io
-from datetime import datetime, date
-
+from datetime import datetime
 import streamlit as st
 
-# --- optional imports that may be heavy; app falls back gracefully if missing
+# Optional heavy imports
 try:
     from transformers import pipeline
     EMOTION_PIPE_AVAILABLE = True
@@ -35,11 +32,16 @@ try:
 except Exception:
     OPENAI_AVAILABLE = False
 
-import matplotlib.pyplot as plt
+# Import visualization and data libs
+try:
+    import matplotlib.pyplot as plt
+except Exception:
+    plt = None
+
 import pandas as pd
 
 # ---------------------------
-# Config and DB
+# CONFIG & DB
 # ---------------------------
 st.set_page_config(page_title="MindEase", layout="wide", initial_sidebar_state="expanded")
 
@@ -79,11 +81,12 @@ conn = init_db()
 c = conn.cursor()
 
 # ---------------------------
-# Helpers
+# HELPERS
 # ---------------------------
 def add_mood_log(mood_label, score, text):
     ts = datetime.utcnow().isoformat()
-    c.execute("INSERT INTO mood_log (timestamp,mood_label,score,text) VALUES (?,?,?,?)", (ts, mood_label, score, text))
+    c.execute("INSERT INTO mood_log (timestamp,mood_label,score,text) VALUES (?,?,?,?)",
+              (ts, mood_label, score, text))
     conn.commit()
 
 def add_journal_entry(content):
@@ -115,7 +118,7 @@ def get_chat_history(limit=200):
     return df
 
 # ---------------------------
-# Emotion detection setup
+# EMOTION DETECTION
 # ---------------------------
 EMOTION_MODEL = "j-hartmann/emotion-english-distilroberta-base"
 
@@ -127,10 +130,6 @@ if EMOTION_PIPE_AVAILABLE:
         emotion_pipe = None
 
 def detect_emotion(text):
-    """
-    Returns (label, score) e.g. ("sadness", 0.78)
-    If emotion pipeline not available, fallback to simple heuristics.
-    """
     if emotion_pipe:
         try:
             out = emotion_pipe(text[:512])[0]
@@ -139,8 +138,7 @@ def detect_emotion(text):
             return label.lower(), score
         except Exception:
             pass
-
-    # fallback: naive heuristics
+    # fallback simple heuristics
     txt = text.lower()
     if any(w in txt for w in ["sad", "depress", "hopeless", "alone", "cry"]):
         return "sadness", 0.6
@@ -153,20 +151,16 @@ def detect_emotion(text):
     return "neutral", 0.5
 
 # ---------------------------
-# OpenAI chat helper
+# OPENAI CHAT
 # ---------------------------
 def openai_reply(system_prompt, conversation_messages, model="gpt-4o-mini"):
     api_key = os.getenv("OPENAI_API_KEY", "")
     if not api_key:
-        return "OpenAI API key not set. Please set OPENAI_API_KEY environment variable."
+        return "(No OpenAI key set) Cannot provide AI response."
     try:
         import openai
         openai.api_key = api_key
-    except Exception as e:
-        return f"OpenAI library not available: {e}"
-
-    messages = [{"role":"system","content":system_prompt}] + conversation_messages
-    try:
+        messages = [{"role":"system","content":system_prompt}] + conversation_messages
         resp = openai.ChatCompletion.create(
             model=model,
             messages=messages,
@@ -174,13 +168,12 @@ def openai_reply(system_prompt, conversation_messages, model="gpt-4o-mini"):
             temperature=0.7,
             top_p=0.9
         )
-        text = resp.choices[0].message.content.strip()
-        return text
+        return resp.choices[0].message.content.strip()
     except Exception as e:
         return f"OpenAI error: {e}"
 
 # ---------------------------
-# Crisis detection
+# CRISIS DETECTION
 # ---------------------------
 CRISIS_KEYWORDS = [
     "i want to die", "i'm going to kill myself", "i want to kill myself", "end my life",
@@ -202,23 +195,19 @@ st.session_state["theme"] = theme_choice
 
 def apply_theme():
     if st.session_state.get("theme") == "Dark":
-        st.markdown(
-            """
-            <style>
-            body, .block-container {background-color: #0E1117; color: #FFFFFF;}
-            .sidebar .sidebar-content {background-color: #1C1F26; color: #FFFFFF;}
-            textarea, input, select {background-color: #2C2F38 !important; color: #FFFFFF !important;}
-            </style>
-            """, unsafe_allow_html=True)
+        st.markdown("""
+        <style>
+        body, .block-container {background-color: #0E1117; color: #FFFFFF;}
+        .sidebar .sidebar-content {background-color: #1C1F26; color: #FFFFFF;}
+        textarea, input, select {background-color: #2C2F38 !important; color: #FFFFFF !important;}
+        </style>""", unsafe_allow_html=True)
     else:
-        st.markdown(
-            """
-            <style>
-            body, .block-container {background-color: #FFFFFF; color: #000000;}
-            .sidebar .sidebar-content {background-color: #F5F5F5; color: #000000;}
-            textarea, input, select {background-color: #FFFFFF !important; color: #000000 !important;}
-            </style>
-            """, unsafe_allow_html=True)
+        st.markdown("""
+        <style>
+        body, .block-container {background-color: #FFFFFF; color: #000000;}
+        .sidebar .sidebar-content {background-color: #F5F5F5; color: #000000;}
+        textarea, input, select {background-color: #FFFFFF !important; color: #000000 !important;}
+        </style>""", unsafe_allow_html=True)
 
 apply_theme()
 
@@ -228,13 +217,13 @@ apply_theme()
 st.sidebar.title("MindEase — Settings & Privacy")
 st.sidebar.markdown("""
 **Privacy**
-- Your data is stored locally (SQLite) by default in this prototype.
-- You can export or delete your data anytime.
-- This chatbot is a supportive tool — it is **not** a replacement for professional care.
+- Data stored locally (SQLite) by default.
+- Export or delete your data anytime.
+- Not a replacement for professional care.
 """)
 
 tone = st.sidebar.selectbox("Assistant tone", ["Calm & Gentle", "Cheerful & Encouraging", "Formal & Respectful"])
-remember = st.sidebar.checkbox("Enable context memory (local)", value=True)
+remember = st.sidebar.checkbox("Enable context memory", value=True)
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("**Export / Manage Data**")
@@ -244,16 +233,12 @@ if st.sidebar.button("Export data (CSV)"):
     chat_df = get_chat_history(10000)
     output = io.StringIO()
     output.write("=== MOOD LOG ===\n")
-    if not mood_df.empty:
-        mood_df.to_csv(output, index=False)
+    if not mood_df.empty: mood_df.to_csv(output, index=False)
     output.write("\n=== JOURNALS ===\n")
-    if not journal_df.empty:
-        journal_df.to_csv(output, index=False)
+    if not journal_df.empty: journal_df.to_csv(output, index=False)
     output.write("\n=== CHATS ===\n")
-    if not chat_df.empty:
-        chat_df.to_csv(output, index=False)
-    b = output.getvalue().encode('utf-8')
-    st.sidebar.download_button("Download data (.txt)", data=b, file_name="mindease_export.txt", mime="text/plain")
+    if not chat_df.empty: chat_df.to_csv(output, index=False)
+    st.sidebar.download_button("Download data (.txt)", data=output.getvalue(), file_name="mindease_export.txt", mime="text/plain")
 
 if st.sidebar.button("Clear all local data"):
     c.execute("DELETE FROM mood_log")
@@ -266,7 +251,7 @@ st.sidebar.markdown("---")
 st.sidebar.markdown("Need urgent help? See the Crisis & Helplines tab.")
 
 # ---------------------------
-# TABS (Home, Chat, Breathing, CBT, Journal, Analytics, Crisis, Settings)
+# TABS
 # ---------------------------
 tabs = st.tabs(["Home", "Chat", "Breathing", "CBT Tools", "Journal & Mood", "Analytics", "Crisis & Helplines", "Settings"])
 home, chat_tab, breathing_tab, cbt_tab, journal_tab, analytics_tab, crisis_tab, settings_tab = tabs
@@ -276,8 +261,8 @@ home, chat_tab, breathing_tab, cbt_tab, journal_tab, analytics_tab, crisis_tab, 
 # ---------------------------
 with home:
     st.header("MindEase — Your AI Mental Wellness Companion")
-    st.write("This prototype demonstrates many mental-health support features: empathetic chat, mood tracking, CBT mini-tools, journaling, crisis detection, and analytics.")
-    st.write("**Important:** This is *not* a substitute for professional mental health care. If you are in immediate danger, contact local emergency services now.")
+    st.write("This prototype demonstrates many mental-health support features.")
+    st.write("**Important:** Not a substitute for professional care.")
     st.markdown("---")
     st.subheader("Quick Start")
     st.write("- Go to **Chat** to talk with the assistant.")
@@ -290,56 +275,47 @@ with home:
 # ---------------------------
 with chat_tab:
     st.subheader("Chat with MindEase")
-    st.write("Type how you're feeling or what you'd like to talk about. The assistant will respond empathetically and offer coping strategies.")
+    st.write("Type how you're feeling or what you'd like to talk about. The assistant will respond empathetically.")
     hist_df = get_chat_history(200)
     if not hist_df.empty:
         for _, row in hist_df.iterrows():
-            role = row['role']
-            msg = row['message']
-            if role == "user":
-                st.markdown(f"**You:** {msg}")
-            else:
-                st.markdown(f"**MindEase:** {msg}")
+            role, msg = row['role'], row['message']
+            if role == "user": st.markdown(f"**You:** {msg}")
+            else: st.markdown(f"**MindEase:** {msg}")
 
     user_input = st.text_area("Write to MindEase", value="", height=120)
-    col1, col2 = st.columns([1,4])
-    with col1:
-        if st.button("Send"):
-            if not user_input.strip():
-                st.warning("Please write something...")
+    if st.button("Send"):
+        if not user_input.strip():
+            st.warning("Please write something...")
+        else:
+            add_chat("user", user_input)
+            if detect_crisis(user_input):
+                resp = ("I’m truly sorry you're feeling this way. Contact emergency services immediately.")
+                add_chat("assistant", resp)
+                st.markdown(f"**MindEase:** {resp}")
             else:
-                add_chat("user", user_input)
-                if detect_crisis(user_input):
-                    resp = ("I’m truly sorry you’re feeling this way. If you are thinking about harming yourself, please contact emergency services or a suicide prevention hotline now. "
-                            "If you're in India call 9152987821 (AASRA) or find a local helpline. Would you like me to show resources?")
-                    add_chat("assistant", resp)
-                    st.markdown(f"**MindEase:** {resp}")
+                label, score = detect_emotion(user_input)
+                add_mood_log(label, score, user_input)
+                tone_map = {
+                    "Calm & Gentle": "You are a calm, gentle mental health assistant.",
+                    "Cheerful & Encouraging": "You are a friendly, upbeat assistant.",
+                    "Formal & Respectful": "You are a respectful, formal assistant."
+                }
+                system_prompt = tone_map.get(tone, tone_map["Calm & Gentle"])
+                conversation = []
+                if remember:
+                    past = get_chat_history(20)
+                    if not past.empty:
+                        for _, r in past.tail(6).iterrows():
+                            conversation.append({"role": r['role'], "content": r['message']})
+                conversation.append({"role":"user","content": f"[detected_emotion:{label}] {user_input}"})
+                if os.getenv("OPENAI_API_KEY",""):
+                    reply = openai_reply(system_prompt, conversation)
                 else:
-                    label, score = detect_emotion(user_input)
-                    add_mood_log(label, score, user_input)
-                    tone_map = {
-                        "Calm & Gentle": "You are a calm, gentle, empathetic mental health assistant. Validate feelings, ask supportive follow-up questions, and offer short practical coping steps.",
-                        "Cheerful & Encouraging": "You are a friendly, upbeat assistant. Be encouraging, positive, and motivating while still validating feelings.",
-                        "Formal & Respectful": "You are a respectful, formal assistant. Use professional tone, clear structure, and concise suggestions."
-                    }
-                    system_prompt = tone_map.get(tone, tone_map["Calm & Gentle"])
-                    conversation = []
-                    if remember:
-                        past = get_chat_history(20)
-                        if not past.empty:
-                            for _, r in past.tail(6).iterrows():
-                                conversation.append({"role": r['role'], "content": r['message']})
-                    conversation.append({"role":"user","content": f"[detected_emotion:{label}] {user_input}"})
-                    if os.getenv("OPENAI_API_KEY",""):
-                        reply = openai_reply(system_prompt, conversation)
-                    else:
-                        reply = ("(No OpenAI key set) I detect you may be feeling " + label + 
-                                 ". Try a 3-part breathing exercise, or tell me more about what's on your mind.")
-                    add_chat("assistant", reply)
-                    st.markdown(f"**MindEase:** {reply}")
+                    reply = f"(No OpenAI key) Detected emotion: {label}. Try deep breathing or journaling."
+                add_chat("assistant", reply)
+                st.markdown(f"**MindEase:** {reply}")
 
 # ---------------------------
-# The rest of the tabs (Breathing, CBT, Journal, Analytics, Crisis, Settings)
-# ---------------------------
-# You can integrate the existing code for Breathing, CBT, Journal, Analytics, Crisis, and Settings here as before.
-# They will automatically adopt the theme via `apply_theme()` at runtime.
+# You can continue integrating Breathing, CBT, Journal, Analytics, Crisis, Settings
+# They will automatically adopt the theme with apply_theme()
