@@ -17,6 +17,15 @@ import sqlite3
 import io
 from datetime import datetime
 import streamlit as st
+import openai
+import streamlit as st
+
+# Read API key from Streamlit secrets
+api_key = st.secrets.get("OPENAI_API_KEY", "")
+if not api_key:
+    st.warning("OpenAI API key not set! Add it in Streamlit Secrets.")
+else:
+    openai.api_key = api_key
 
 # ---------------------------
 # Optional imports
