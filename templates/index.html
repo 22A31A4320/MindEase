@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mind Erase - Mental Health Analyzer</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>🧘‍♀️ Mind Erase Analysis</h1>
+    <p class="subtitle">Answer a few simple questions to assess your emotional wellness.</p>
+
+    <form method="POST" action="/quiz">
+
+      <div class="question">
+        <h3>1️⃣ How is your current mood?</h3>
+        <div class="options">
+          <label><input type="radio" name="mood" value="happy" required><span>😊 Happy</span></label>
+          <label><input type="radio" name="mood" value="neutral"><span>😐 Neutral</span></label>
+          <label><input type="radio" name="mood" value="sad"><span>😢 Sad</span></label>
+          <label><input type="radio" name="mood" value="irritable"><span>😤 Irritable</span></label>
+          <label><input type="radio" name="mood" value="anxious"><span>😰 Anxious</span></label>
+        </div>
+      </div>
+
+      <div class="question">
+        <h3>2️⃣ How many hours do you sleep per night?</h3>
+        <input type="number" name="sleep" min="0" max="12" placeholder="Enter hours (e.g., 7)" required>
+      </div>
+
+      <div class="question">
+        <h3>3️⃣ Your energy level today?</h3>
+        <div class="options">
+          <label><input type="radio" name="energy" value="high" required><span>⚡ High</span></label>
+          <label><input type="radio" name="energy" value="medium"><span>🙂 Medium</span></label>
+          <label><input type="radio" name="energy" value="low"><span>😴 Low</span></label>
+          <label><input type="radio" name="energy" value="verylow"><span>🥱 Very Low</span></label>
+        </div>
+      </div>
+
+      <div class="question">
+        <h3>4️⃣ How often do you feel anxious?</h3>
+        <div class="options">
+          <label><input type="radio" name="anxiety" value="never" required><span>🕊️ Never</span></label>
+          <label><input type="radio" name="anxiety" value="sometimes"><span>😶 Sometimes</span></label>
+          <label><input type="radio" name="anxiety" value="often"><span>😟 Often</span></label>
+          <label><input type="radio" name="anxiety" value="always"><span>😨 Always</span></label>
+        </div>
+      </div>
+
+      <div class="question">
+        <h3>5️⃣ How motivated do you feel?</h3>
+        <div class="options">
+          <label><input type="radio" name="motivation" value="very" required><span>🔥 Very</span></label>
+          <label><input type="radio" name="motivation" value="somewhat"><span>🙂 Somewhat</span></label>
+          <label><input type="radio" name="motivation" value="not"><span>😔 Not Motivated</span></label>
+        </div>
+      </div>
+
+      <div class="question">
+        <h3>6️⃣ How is your concentration?</h3>
+        <div class="options">
+          <label><input type="radio" name="concentration" value="easily" required><span>🎯 Easily Focused</span></label>
+          <label><input type="radio" name="concentration" value="sometimes"><span>😶 Sometimes</span></label>
+          <label><input type="radio" name="concentration" value="hardly"><span>😵 Hardly</span></label>
+        </div>
+      </div>
+
+      <div class="question">
+        <h3>7️⃣ How often do you socialize?</h3>
+        <div class="options">
+          <label><input type="radio" name="social" value="daily" required><span>👥 Daily</span></label>
+          <label><input type="radio" name="social" value="weekly"><span>🗓️ Weekly</span></label>
+          <label><input type="radio" name="social" value="rarely"><span>🚪 Rarely</span></label>
+          <label><input type="radio" name="social" value="never"><span>🙅 Never</span></label>
+        </div>
+      </div>
+
+      <div class="question">
+        <h3>8️⃣ How often do you take time for self-care?</h3>
+        <div class="options">
+          <label><input type="radio" name="selfcare" value="daily" required><span>🌿 Daily</span></label>
+          <label><input type="radio" name="selfcare" value="weekly"><span>🧘 Weekly</span></label>
+          <label><input type="radio" name="selfcare" value="rarely"><span>💼 Rarely</span></label>
+        </div>
+      </div>
+
+      <div class="question">
+        <h3>9️⃣ How do you see your future?</h3>
+        <div class="options">
+          <label><input type="radio" name="outlook" value="positive" required><span>🌈 Positive</span></label>
+          <label><input type="radio" name="outlook" value="neutral"><span>😐 Neutral</span></label>
+          <label><input type="radio" name="outlook" value="negative"><span>☁️ Negative</span></label>
+        </div>
+      </div>
+
+      <button type="submit" class="btn">Analyze My Mind 💭</button>
+    </form>
+  </div>
+</body>
+</html>

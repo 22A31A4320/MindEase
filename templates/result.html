@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mind Erase - Result</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>🧠 Mind Analysis Result</h1>
+    <p class="subtitle">Here’s your mental health insight:</p>
+
+    <h2 style="text-align:center;">{{ status }}</h2>
+    <p style="text-align:center; font-size:18px;">Your Mind Health Score: <strong>{{ score }}/90</strong></p>
+    <p style="text-align:center; font-size:17px;">💡 <b>Suggestion:</b> {{ suggestion }}</p>
+
+    <div style="text-align:center; margin-top:25px;">
+      <a href="/" class="btn">🔁 Start Again</a>
+    </div>
+  </div>
+</body>
+</html>
