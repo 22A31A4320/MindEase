@@ -1,20 +1,58 @@
-# MindEase
+# 🧠 Mind Erase – Mental Health Analyzer
 
-MindEase is an AI-powered mental health chatbot prototype built with Streamlit. It includes:
+A modern, interactive web application that helps users understand and analyze their **mental wellness** through a short, psychologist-inspired questionnaire.  
+Built using **Flask**, **HTML**, **CSS**, and designed with a **blue & white calming aesthetic** for a professional and engaging experience.
 
-- Empathetic chat using OpenAI
-- Emotion detection using Transformers
-- Mood tracking and journaling (SQLite)
-- CBT mini-tools (cognitive reframing)
-- Guided breathing exercises
-- Crisis detection and helpline resources
-- Analytics and data export
-- Light/Dark mode support
+---
 
-## Installation
+## 🌐 Live Demo
+👉 [Deployed Version on Render / Vercel](#) *(Add your link here once deployed)*
 
+---
+
+## 🎯 Features
+
+✅ **Start Page** — A simple and welcoming start screen to begin your wellness journey.  
+✅ **Interactive Quiz** — Psychologically informed questions with emoji-rich, easy-to-select answers.  
+✅ **Smart Analysis** — Calculates your mental wellness score based on your responses and sleeping habits.  
+✅ **Personalized Suggestions** — Provides practical tips based on your current mental health level.  
+✅ **Responsive Design** — Beautiful and optimized layout for both desktop and mobile.  
+✅ **Attractive Blue–White Theme** — Uses calm tones to create a soothing experience for users.
+
+---
+
+## 🖼️ Screenshots
+
+### 🏁 Start Page
+The journey begins with a calm welcome screen.  
+![Start Page Screenshot](screenshots/start_page.png)
+
+### 💬 Questionnaire
+Answer questions that reflect your mood, motivation, energy, and more.  
+![Questionnaire Screenshot](screenshots/quiz_page.png)
+
+### 📊 Result Page
+Get instant feedback, analysis, and wellness suggestions.  
+![Result Page Screenshot](screenshots/result_page.png)
+
+---
+
+## 🧩 Tech Stack
+
+| Component | Technology |
+|------------|-------------|
+| **Frontend** | HTML5, CSS3 (Poppins font, emoji-based UI) |
+| **Backend** | Flask (Python) |
+| **Design** | White & Blue Modern UI |
+| **Deployment** | Render / Vercel |
+
+---
+
+## ⚙️ Installation Guide
+
+Follow these steps to set up and run **Mind Erase** locally.
+
+### 1️⃣ Clone the Repository
 ```bash
-git clone https://github.com/yourusername/MindEase.git
-cd MindEase
-pip install -r requirements.txt
-streamlit run mindease_app.py
+git clone https://github.com/yourusername/mind-erase.git
+cd mind-erase
